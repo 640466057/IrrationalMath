@@ -10,7 +10,7 @@ namespace MathTests
         {
             BigFloat a = new([7, 3], 0, false);
             BigFloat b = new([15, 99, 72662], 0, false);
-            BigFloat c = a.FlipBits();
+            BigFloat c = -a;
             BigFloat d = new([7, 3, 0], 0, false);
             BigFloat e = new([108086391056891904], 4, false);
 
@@ -26,7 +26,7 @@ namespace MathTests
         {
             BigFloat a = new([7, 3], 8, false);
             BigFloat b = new([15, 99, 72662], 97, false);
-            BigFloat c = a.FlipBits();
+            BigFloat c = -a;
             BigFloat d = new([7, 3, 0], 8, false);
 
             Assert.AreEqual("108086391056891904.02734375", a.ToString());
@@ -95,25 +95,29 @@ namespace MathTests
         {
             BigFloat a = new([7, 3], 0, false);
             BigFloat b = new([15, 99, 72662], 0, false);
-            BigFloat c = new BigFloat([611, 225], 0, false).FlipBits();
+            BigFloat c = -new BigFloat([611, 225], 0, false);
 
             Assert.AreEqual("6181399336302307658044872215249544632336406;0", (a + b).ToString("dec"));
             Assert.AreEqual((b + a).ToString("dec"), (a + b).ToString("dec"));
 
             Assert.AreEqual("6181399336302307658042769286425141743451564;0", (b + c).ToString("dec"));
-            Assert.AreEqual("-6181399336302307658042769286425141743451564;0", (b.FlipBits() + c.FlipBits()).ToString("dec"));
+            Assert.AreEqual("-6181399336302307658042769286425141743451564;0", (-b + -c).ToString("dec"));
             Assert.AreEqual((b + c).ToString("dec"), (c + b).ToString("dec"));
 
             Assert.AreEqual("-2047588592181760229980;0", (a + c).ToString("dec"));
-            Assert.AreEqual("2047588592181760229980;0", (a.FlipBits() + c.FlipBits()).ToString("dec"));
+            Assert.AreEqual("2047588592181760229980;0", (-a + -c).ToString("dec"));
         }
 
         [TestMethod]
-        public void FlipBits()
+        public void Negatives()
         {
-            BigFloat a = new BigFloat([7, 3], 0, false).FlipBits();
+            BigFloat a = -new BigFloat([7, 3], 0, false);
             Assert.AreEqual("-27670116110564327431;0", a.ToString("dec"));
-            Assert.AreEqual("27670116110564327431;0", a.FlipBits().ToString("dec"));
+            Assert.AreEqual("27670116110564327431;0", (-a).ToString("dec"));
+
+            BigFloat b = -new BigFloat([7, 3], 5, false);
+            Assert.AreEqual("-27670116110564327431;5", b.ToString("dec"));
+            Assert.AreEqual("27670116110564327431;5", (-b).ToString("dec"));
         }
     }
 }

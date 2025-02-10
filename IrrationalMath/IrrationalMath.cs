@@ -82,7 +82,7 @@
             BigFloat number;
             bool sign = Sign;
             if (sign == true)
-                number = FlipBits();
+                number = -this;
             else
                 number = this;
 
@@ -141,7 +141,7 @@
                     BigFloat number;
 
                     if (Sign == true)
-                        number = FlipBits();
+                        number = -this;
                     else
                         number = new BigFloat(Bits.ToArray(), Precision, Sign);
 
@@ -212,17 +212,6 @@
             return (c, sign);
         }
 
-        static (long, bool) PartialSubtraction(long a, long b, bool rest)
-        {
-            long c = a - b;
-            if (rest)
-                c -= 1;
-            bool sign = c < 0L;
-            if (sign)
-                c &= 0x7FFFFFFFFFFFFFFFL;
-            return (c, sign);
-        }
-
         public static BigFloat operator +(BigFloat a, BigFloat b)
         {
             (long, bool) PartialResult;
@@ -287,7 +276,28 @@
 
         public static BigFloat operator -(BigFloat a, BigFloat b)
         {
-            return a + b.FlipBits();
+            return a + -b;
+        }
+
+        public static BigFloat operator -(BigFloat a)
+        {
+            BigFloat output = new(new long[a.Bits.Length], a.Precision, !a.Sign);
+            bool rest = true;
+            for (int i = 0; i < a.Bits.Length; i++)
+            {
+                if (rest)
+                {
+                    output.Bits[i] = ((~a.Bits[i]) & 0x7fffffffffffffff) + 1;
+                    rest = output.Bits[i] < 0;
+                    if (rest)
+                        output.Bits[i] &= 0x7fffffffffffffff;
+                }
+                else
+                {
+                    output.Bits[i] = (~a.Bits[i]) & 0x7fffffffffffffff;
+                }
+            }
+            return output;
         }
 
         public static BigFloat operator <<(BigFloat a, uint b)
@@ -394,14 +404,6 @@
             for (int i = 0; i < a.Bits.Length; i++)
                 output.Bits[i] = (~a.Bits[i]) & 0x7fffffffffffffff;
             return output;
-        }
-
-        public readonly BigFloat FlipBits()
-        {
-            BigFloat output = new(new long[Bits.Length], Precision, !Sign);
-            for (int i = 0; i < Bits.Length; i++)
-                output.Bits[i] = (~Bits[i]) & 0x7fffffffffffffff;
-            return output + new BigFloat(new long[1] { 1 }, 0, false);
         }
     }
 
